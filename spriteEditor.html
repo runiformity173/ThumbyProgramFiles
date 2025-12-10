@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            #main {
+                width: min(100vw, 100vh);
+                height: min(100vw, 100vh);
+                position: absolute;
+                left:0;
+                top:0;
+            }
+            body {
+                background-color: #212529;
+                overflow: hidden;
+            }
+            .editorButton {
+                position: absolute;
+                background-color: #000;
+                cursor: pointer;
+            }
+            .editorButton:hover {
+                background-color: blue;
+            }
+            .editorButton.enabled {
+                background-color: #fff;
+            }
+            .editorButton.enabled:hover {
+                background-color: lightblue;
+            }
+            #sidebar {
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 10%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main"></div>
+        <div id="sidebar">
+            <button onclick="newCanvas()">new canvas</button>
+            <button onclick="loadArray()">load byte array</button>
+            <button onclick="saveArray()">save byte array</button>
+        </div>
+        <script>
+            const main = document.getElementById("main");
+            let HEIGHT, WIDTH;
+            function newCanvas() {
+                HEIGHT = Number(prompt("height?"));
+                WIDTH = Number(prompt("width?"));
+                if (HEIGHT < 1 || WIDTH < 1) return;
+                Y_PIXEL = main.clientHeight/HEIGHT;
+                X_PIXEL = main.clientWidth/WIDTH;
+                main.innerHTML = "";
+                for (let i = 0;i < HEIGHT; i++) {
+                    for (let j = 0;j < WIDTH; j++) {
+                        const btn = document.createElement("span");
+                        btn.classList.add("editorButton")
+                        btn.style.top = (Y_PIXEL*i)+"px";
+                        btn.style.width = (X_PIXEL)+"px";
+                        btn.style.height = (Y_PIXEL)+"px";
+                        btn.style.left = (X_PIXEL*j)+"px";
+                        const d = Math.floor(i/8)
+                        btn.id = String((8*WIDTH*(d))+j*8+(i%8));
+                        btn.classList.add("b"+i+"b"+j);
+                        btn.addEventListener("click", function(e) {
+                            if (e.target.classList.contains("enabled"))
+                            e.target.classList.remove("enabled");
+                            else e.target.classList.add("enabled");
+                        })
+                        main.appendChild(btn);
+                    }
+                }
+            }
+            function loadArray() {
+                if (document.querySelector("#main .editorButton") == null) {
+                    alert("create a canvas first pls");
+                    return
+                } 
+                const array = JSON.parse(prompt("byteArray:"));
+                let count = 0;
+                for (const byte of array) {
+                    for (let i = 0;i<8;i++) {
+                        const enabled = !!(byte&(1<<i));
+                        const cell = document.getElementById(String(count));
+                        count += 1
+                        if (!cell) continue;
+                        if (cell.classList.contains("enabled") && !enabled)
+                            cell.classList.remove("enabled");
+                        else if (enabled)
+                            cell.classList.add("enabled");
+                    }
+                }
+            }
+            function saveArray() {
+                let final = [];
+                for (let i = 0;i<HEIGHT;i += 8) {
+                    for (let j = 0;j<WIDTH;j++) {
+                        let byte = 0;
+                        for (let k = i;k<i+8;k++) {
+                            const a = document.querySelector(".b"+k+"b"+j);
+                            if (a && a.classList.contains("enabled")) byte += 1 << (k-i);
+                        }
+                        final.push(byte);
+                    }
+                }
+                console.log(JSON.stringify(final));
+                alert(JSON.stringify(final))
+                /*
+[0,0,0,0,0,0,0,0,248,8,232,40,40,40,40,40,40,40,40,40,40,232,8,248,0,0,0,0,0,0,0,
+                     0,0,0,0,0,0,0,0,0,255,0,63,32,32,32,32,32,32,32,32,32,32,63,0,255,0,0,0,0,0,0,0,
+                     0,0,0,0,0,0,0,0,0,255,0,12,12,63,63,12,12,0,0,24,24,3,3,0,255,0,0,0,0,0,0,0,0,0,
+                     0,0,0,0,0,0,0,31,16,16,16,16,20,18,16,20,18,16,16,16,16,16,31,0,0,0,0,0,0,0,0]
+*/
+            }
+        </script>
+    </body>
+</html>
+
