@@ -5,13 +5,22 @@ from random import randint
 
 restartBmp = bytearray([240,12,2,2,1,1,1,1,1,2,2,12,240,0,1,6,8,8,16,16,16,0,0,14,12,10,1,0])
 restartSprite = thumby.Sprite(14,14,restartBmp)
+returnBmp = bytearray([0,4,14,21,4,4,4,4,4,4,4,8,8,240,0,0,0,0,2,2,2,2,2,2,2,1,1,0])
+returnSprite = thumby.Sprite(14,14,returnBmp)
 thumby.display.setFPS(10)
-thumby.display.fill(0) # Fill canvas to black
 restartSprite.x = 72-14
 restartSprite.y = 9
-thumby.display.drawText("A",72-10,0,1)
-thumby.display.drawSprite(restartSprite)
-thumby.display.update()
+returnSprite.x = 0
+returnSprite.y = 9
+def drawSorting():
+    thumby.display.fill(0) # Fill canvas to black
+    thumby.display.drawText("A",72-10,0,1)
+    thumby.display.drawText("B",4,0,1)
+    thumby.display.drawSprite(restartSprite)
+    thumby.display.drawSprite(returnSprite)
+def drawMenu():
+    thumby.display.fill(0) # Fill canvas to black
+    thumby.display.drawText("Quicksort",0,0,1)
 arr = list(range(1,41))
 def shuffle(seq):
     for _ in range(200):
@@ -39,21 +48,40 @@ def swap(i,j):
     sortingOps.append((i,j))
 count = 0
 sortingOps = []
-shuffle(arr)
-duplicate = arr[:]
-for i,val in enumerate(arr):
-    thumby.display.drawLine(16+i,40-val,16+i,39,1)
-thumby.display.update()
-quicksort()
+sorts = {
+    "Quicksort":quicksort,
+}
+options = list(sorts.keys())
+state = "menu"
+drawMenu()
 while(1):
     t0 = time.ticks_ms()   # Get time (ms)
-    if count < len(sortingOps):
-        i,j = sortingOps[count]
-        if j != i:
-            duplicate[i],duplicate[j] = duplicate[j],duplicate[i]
-            thumby.display.drawLine(16+i,0,16+i,39,0)
-            thumby.display.drawLine(16+i,40-duplicate[i],16+i,39,1)
-            thumby.display.drawLine(16+j,0,16+j,39,0)
-            thumby.display.drawLine(16+j,40-duplicate[j],16+j,39,1)
-        count += 1
+    if state == "sorting":
+        if count < len(sortingOps):
+            i,j = sortingOps[count]
+            while i == j and count < len(sortingOps):
+                count += 1
+                i,j = sortingOps[count]
+            if j != i:
+                duplicate[i],duplicate[j] = duplicate[j],duplicate[i]
+                thumby.display.drawLine(16+i,0,16+i,39,0)
+                thumby.display.drawLine(16+i,40-duplicate[i],16+i,39,1)
+                thumby.display.drawLine(16+j,0,16+j,39,0)
+                thumby.display.drawLine(16+j,40-duplicate[j],16+j,39,1)
+            count += 1
+        if thumby.buttonB.pressed() or thumby.buttonA.pressed():
+            state = "menu"
+            drawMenu()
+    if state == "menu":
+        if thumby.buttonA.pressed():
+            state = "sorting"
+            drawSorting()
+            shuffle(arr)
+            sortingOps = []
+            duplicate = arr[:]
+            count = 0
+            for i,val in enumerate(arr):
+                thumby.display.drawLine(16+i,40-val,16+i,39,1)
+            selected = 0
+            sorts[options[selected]]()
     thumby.display.update()
