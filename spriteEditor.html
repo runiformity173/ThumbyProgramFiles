@@ -123,6 +123,12 @@
             window.addEventListener("keypress",function (e) {
                 if (e.keyCode == 101) erase = !erase;
                 if (e.keyCode == 100) dragMode = !dragMode;
+                if (e.keyCode == 105) {
+                    [...document.querySelectorAll(".editorButton")].forEach(o=> {
+                        if (o.classList.contains("enabled")) o.classList.remove("enabled");
+                        else o.classList.add("enabled");
+                    })
+                }
             })
         </script>
     </body>
