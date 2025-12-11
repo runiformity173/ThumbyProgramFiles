@@ -68,6 +68,26 @@ def bubbleSort():
         swap(i,i-1)
         sorts += 1
 
+def mergeSort(oglow=0,oghigh=-1):
+    if oghigh == -1: oghigh=39
+    high,low=oghigh,oglow
+    while high-low > 0:
+        mid = (oghigh-oglow)//2 + oglow
+        mergeSort(oglow,mid)
+        mid = (oghigh-oglow)//2 + oglow
+        mergeSort(mid+1,oghigh)
+        mid = (oghigh-oglow)//2 + oglow
+        start2 = mid + 1
+        if arr[mid] <= arr[start2]: break
+        while low <= mid and start2 <= high:
+            if arr[low] <= arr[start2]: low += 1
+            else:
+                shiftDown(low,start2)
+                low += 1
+                mid += 1
+                start2 += 1
+        break
+
 def combSort():
   length = 40
   shrink = 1.3
@@ -87,16 +107,23 @@ def combSort():
 def swap(i,j):
     arr[i],arr[j] = arr[j],arr[i]
     sortingOps.append((i,j))
+def shiftDown(i,j):
+    sortingOps.append((i,j))
+    temp = arr[j]
+    for k in range(j,i,-1):
+        arr[k] = arr[k-1]
+    arr[i] = temp
 count = 0
 sortingOps = []
 sorts = {
     "Quicksort":quicksort,
+    "Merge Sort":mergeSort,
     "Heapsort":heapSort,
     "Bubble Sort":bubbleSort,
     "Comb Sort":combSort,
 }
-options = ["Quicksort","Heapsort","Bubble Sort","Comb Sort"]
-FPSs = [10,15,30,10]
+options = ["Quicksort","Merge Sort","Heapsort","Bubble Sort","Comb Sort"]
+FPSs = [10,10,15,30,10]
 def drawMenu():
     thumby.display.fill(0) # Fill canvas to black
     for i in range(len(options)):
@@ -113,11 +140,20 @@ while(1):
                 count += 1
                 i,j = sortingOps[count]
             if j != i:
-                duplicate[i],duplicate[j] = duplicate[j],duplicate[i]
-                thumby.display.drawLine(16+i,0,16+i,39,0)
-                thumby.display.drawLine(16+i,40-duplicate[i],16+i,39,1)
-                thumby.display.drawLine(16+j,0,16+j,39,0)
-                thumby.display.drawLine(16+j,40-duplicate[j],16+j,39,1)
+                if selected == 1:
+                    temp = duplicate[j]
+                    for k in range(j,i,-1):
+                        duplicate[k] = duplicate[k-1]
+                    duplicate[i] = temp
+                    for k in range(i,j+1):
+                        thumby.display.drawLine(16+k,0,16+k,39,0)
+                        thumby.display.drawLine(16+k,40-duplicate[k],16+k,39,1)
+                else:
+                    duplicate[i],duplicate[j] = duplicate[j],duplicate[i]
+                    thumby.display.drawLine(16+i,0,16+i,39,0)
+                    thumby.display.drawLine(16+i,40-duplicate[i],16+i,39,1)
+                    thumby.display.drawLine(16+j,0,16+j,39,0)
+                    thumby.display.drawLine(16+j,40-duplicate[j],16+j,39,1)
             count += 1
         if thumby.buttonB.pressed() or thumby.buttonA.pressed():
             state = "menu"
