@@ -23,7 +23,7 @@ def shuffle(seq):
         i,j = randint(0,len(seq)-1),randint(0,len(seq)-1)
         seq[i],seq[j] = seq[j],seq[i]
 sortingOps = []
-thumby.display.setFPS(20)
+thumby.display.setFPS(10)
 def quicksort(i=0,j=39):
     if j-i < 2:return
     mid = (i+j)//2
@@ -121,7 +121,7 @@ while(1):
             count += 1
         if thumby.buttonB.pressed() or thumby.buttonA.pressed():
             state = "menu"
-            thumby.display.setFPS(20)
+            thumby.display.setFPS(10)
             drawMenu()
     if state == "menu":
         if thumby.buttonU.pressed():
