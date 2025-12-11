@@ -7,7 +7,6 @@ restartBmp = bytearray([240,12,2,2,1,1,1,1,1,2,2,12,240,0,1,6,8,8,16,16,16,0,0,1
 restartSprite = thumby.Sprite(14,14,restartBmp)
 returnBmp = bytearray([0,4,14,21,4,4,4,4,4,4,4,8,8,240,0,0,0,0,2,2,2,2,2,2,2,1,1,0])
 returnSprite = thumby.Sprite(14,14,returnBmp)
-thumby.display.setFPS(10)
 restartSprite.x = 72-14
 restartSprite.y = 9
 returnSprite.x = 0
@@ -24,6 +23,7 @@ def shuffle(seq):
         i,j = randint(0,len(seq)-1),randint(0,len(seq)-1)
         seq[i],seq[j] = seq[j],seq[i]
 sortingOps = []
+thumby.display.setFPS(20)
 def quicksort(i=0,j=39):
     if j-i < 2:return
     mid = (i+j)//2
@@ -59,6 +59,31 @@ def heapSort():
     heapify(i, 0)
   return arr
 
+def bubbleSort():
+  sorts = 1
+  while sorts > 0:
+    sorts = 0
+    for i in range(1,40):
+      if (arr[i] < arr[i-1]):
+        swap(i,i-1)
+        sorts += 1
+
+def combSort():
+  length = 40
+  shrink = 1.3
+  gap = length
+  sorted = False
+  while not sorted:
+    gap = int(gap/shrink)
+    if gap <= 1:
+      sorted = True
+      gap = 1
+    for i in range(40-gap):
+        sm = gap + i
+        if arr[i] > arr[sm]:
+            swap(i,sm)
+            sorted = False
+
 def swap(i,j):
     arr[i],arr[j] = arr[j],arr[i]
     sortingOps.append((i,j))
@@ -67,8 +92,11 @@ sortingOps = []
 sorts = {
     "Quicksort":quicksort,
     "Heapsort":heapSort,
+    "Bubble Sort":bubbleSort,
+    "Comb Sort":combSort,
 }
-options = list(sorts.keys())
+options = ["Quicksort","Heapsort","Bubble Sort","Comb Sort"]
+FPSs = [10,15,30,10]
 def drawMenu():
     thumby.display.fill(0) # Fill canvas to black
     for i in range(len(options)):
@@ -93,6 +121,7 @@ while(1):
             count += 1
         if thumby.buttonB.pressed() or thumby.buttonA.pressed():
             state = "menu"
+            thumby.display.setFPS(20)
             drawMenu()
     if state == "menu":
         if thumby.buttonU.pressed():
@@ -110,5 +139,6 @@ while(1):
             count = 0
             for i,val in enumerate(arr):
                 thumby.display.drawLine(16+i,40-val,16+i,39,1)
+            thumby.display.setFPS(FPSs[selected])
             sorts[options[selected]]()
     thumby.display.update()
