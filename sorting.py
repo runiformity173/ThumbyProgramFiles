@@ -18,9 +18,6 @@ def drawSorting():
     thumby.display.drawText("B",4,0,1)
     thumby.display.drawSprite(restartSprite)
     thumby.display.drawSprite(returnSprite)
-def drawMenu():
-    thumby.display.fill(0) # Fill canvas to black
-    thumby.display.drawText("Quicksort",0,0,1)
 arr = list(range(1,41))
 def shuffle(seq):
     for _ in range(200):
@@ -43,6 +40,25 @@ def quicksort(i=0,j=39):
     quicksort(i,l)
     quicksort(l+1,j)
 
+def heapify(n, i):
+  largest = i
+  left = i*2 + 1
+  right = i*2 + 2
+  if left < n and arr[left] > arr[largest]:
+    largest = left
+  if right < n and arr[right] > arr[largest]:
+    largest = right
+  if largest != i:
+    swap(i, largest)
+    heapify(n, largest)
+def heapSort():
+  for i in range(40<<1 - 1,-1,-1):
+    heapify(40, i)
+  for i in range(39,0,-1):
+    swap(0, i)
+    heapify(i, 0)
+  return arr
+
 def swap(i,j):
     arr[i],arr[j] = arr[j],arr[i]
     sortingOps.append((i,j))
@@ -50,9 +66,15 @@ count = 0
 sortingOps = []
 sorts = {
     "Quicksort":quicksort,
+    "Heapsort":heapSort,
 }
 options = list(sorts.keys())
+def drawMenu():
+    thumby.display.fill(0) # Fill canvas to black
+    for i in range(len(options)):
+        thumby.display.drawText((">" if selected == i else " ") + options[i],0,i*8,1)
 state = "menu"
+selected = 0
 drawMenu()
 while(1):
     t0 = time.ticks_ms()   # Get time (ms)
@@ -73,7 +95,13 @@ while(1):
             state = "menu"
             drawMenu()
     if state == "menu":
-        if thumby.buttonA.pressed():
+        if thumby.buttonU.pressed():
+            selected = max(0,selected-1)
+            drawMenu()
+        elif thumby.buttonD.pressed():
+            selected = min(len(options)-1,selected+1)
+            drawMenu()
+        elif thumby.buttonA.pressed():
             state = "sorting"
             drawSorting()
             shuffle(arr)
@@ -82,6 +110,5 @@ while(1):
             count = 0
             for i,val in enumerate(arr):
                 thumby.display.drawLine(16+i,40-val,16+i,39,1)
-            selected = 0
             sorts[options[selected]]()
     thumby.display.update()
