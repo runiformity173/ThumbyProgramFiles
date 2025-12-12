@@ -25,7 +25,7 @@ def shuffle(seq):
 sortingOps = []
 thumby.display.setFPS(60)
 def quicksort(i=0,j=39):
-    if j-i < 2:return
+    if j-i < 1:return
     mid = (i+j)//2
     partition = arr[mid]
     l = i
@@ -37,8 +37,8 @@ def quicksort(i=0,j=39):
             r -= 1
         if l < r:
             swap(l,r)
-    quicksort(i,l)
-    quicksort(l+1,j)
+    quicksort(i,r)
+    quicksort(r+1,j)
 
 def heapify(n, i):
   largest = i
@@ -163,6 +163,7 @@ drawMenu()
 pressing = False
 while(1):
     t0 = time.ticks_ms()   # Get time (ms)
+    restarting = False
     if state == "sorting":
         if count < len(sortingOps):
             i,j = sortingOps[count]
@@ -187,7 +188,9 @@ while(1):
                     thumby.display.drawLine(16+j,0,16+j,39,0)
                     thumby.display.drawLine(16+j,40-duplicate[j],16+j,39,1)
             count += 1
-        if thumby.buttonB.pressed() or thumby.buttonA.pressed():
+        if thumby.buttonA.pressed():
+            restarting = True
+        if thumby.buttonB.pressed() or restarting:
             state = "menu"
             thumby.display.setFPS(60)
             drawMenu()
@@ -206,7 +209,7 @@ while(1):
                 if selected > offset+4:
                    offset += 1
                 drawMenu()
-        elif thumby.buttonA.pressed():
+        elif thumby.buttonA.pressed() or restarting:
             state = "sorting"
             drawSorting()
             if options[selected] in ["Bitonic"]:
